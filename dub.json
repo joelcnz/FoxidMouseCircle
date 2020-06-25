@@ -1,0 +1,43 @@
+{
+	"authors": [
+		"Joel Christensen"
+	],
+	"configurations": [
+		{
+			"name": "executable",
+			"targetType": "executable"
+		},
+		{
+			"dependencies": {
+				"unit-threaded": ">=0.0.0"
+			},
+			"excludedSourceFiles": [
+				"src/main.d"
+			],
+			"mainSourceFile": "bin/ut.d",
+			"name": "unittest",
+			"preBuildCommands": [
+				"$DUB run --compiler=$$DC unit-threaded -c gen_ut_main -- -f bin/ut.d"
+			],
+			"targetType": "executable"
+		}
+	],
+	"copyright": "Copyright © 2020, Joel Christensen",
+	"dependencies": {
+		"bindbc-openal": "~>0.4.1",
+		"foxid": "~>0.0.11",
+		"unit-threaded": "~>1.0.2"
+	},
+	"description": "Testing",
+	"importPaths": [
+		"../../JMiscLib/source"
+	],
+	"license": "proprietary",
+	"name": "foxidtest",
+	"sourcePaths": [
+		"source",
+		"../../JMiscLib/source"
+	],
+	"targetPath": "bin",
+	"targetType": "executable"
+}
