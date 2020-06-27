@@ -18,7 +18,7 @@ class Collect {
         this.size = size;
     }
 
-    void update(Partical m, Collect[] cols) {
+    void update(Partical m, Collect[] cols, Partical[] ch) {
         float dx, dy;
 
         xyaim(dx, dy, getAngle(pos.x, pos.y, m.pos.x, m.pos.y));
@@ -38,6 +38,15 @@ class Collect {
                     pos.x -= dx * 1;
                     pos.y -= dy * 1;
                 }
+            }
+        }
+
+        version(all)
+        foreach(const p; ch) {
+            if (distance(p.pos.x, p.pos.y, pos.x, pos.y) < p.size + size) {
+                xyaim(dx, dy, getAngle(pos.x, pos.y, p.pos.x, p.pos.y));
+                pos.x -= dx * 1;
+                pos.y -= dy * 1;
             }
         }
     }

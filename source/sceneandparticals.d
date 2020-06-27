@@ -73,9 +73,9 @@ class MyScene : Scene
 
 	override void step() {
 		foreach(i, p; ps)
-			p.update(i != ps.length - 1 ? ps[i + 1] : mouse_circle);
+			p.update(i != ps.length - 1 ? ps[i + 1] : mouse_circle, cols);
 		foreach (Collect c; cols) {
-			c.update(mouse_circle, cols);
+			c.update(mouse_circle, cols, ps);
 		}
 	}
 
@@ -178,13 +178,21 @@ class Partical {
 			bigger = true;
 	}
 
-	void update(Partical leader) {
+	void update(Partical leader, Collect[] cols) {
+		float dx, dy;
 		if (distance(leader.pos.x, leader.pos.y, pos.x, pos.y) > (leader.size + size)) { //gap_distance) {
-			float dx, dy;
 			xyaim(dx, dy, getAngle(pos.x, pos.y, leader.pos.x, leader.pos.y));
 			pos.x += dx * move_step;
 			pos.y += dy * move_step;
 		}
+
+        foreach(const c; cols) {
+			if (distance(c.pos.x, c.pos.y, pos.x, pos.y) < c.size + size) {
+				xyaim(dx, dy, getAngle(pos.x, pos.y, c.pos.x, c.pos.y));
+				pos.x -= dx * 1;
+				pos.y -= dy * 1;
+			}
+        }
 	}
 
 	auto getPos() {
