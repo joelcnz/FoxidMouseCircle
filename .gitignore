@@ -1,5 +1,6 @@
 
 bin/foxidtest
+bin/ut.d
 foxidtest-test-library
 Sowerby
 BackUpSaves
