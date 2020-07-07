@@ -1,4 +1,4 @@
-module source.sceneandparticals;
+module source.scene;
 
 @safe:
 import foxid;
@@ -8,25 +8,23 @@ version(unittest)
 
 import jmisc;
 
-import source.base, source.collect;
+import source.base, source.carriage, source.cuddle;
 
 /+
 	Create our first scene
 +/
 class MyScene : Scene
 {
-	Partical[] ps;
-	Collect[] cols;
+	Carriage[] train;
+	Cuddle[] cuds;
 	Sprite spr;
 	import foxid.sdl;
 	SDL_Surface* image;
 
-	ref auto getParticals() { return ps; }
-
 	/+
 		Circle position.
 	+/
-	Partical mouse_circle;
+	Carriage mouse_circle;
 
 	void initSprite() @system {
 		spr = new Sprite();
@@ -43,16 +41,16 @@ class MyScene : Scene
 	}
 
 	override void init() {
-		mouse_circle = new Partical(Vector(0,0));
-		mouse_circle.size = mouse_circle_size;
+		mouse_circle = new Carriage(Vec(0,0));
+		mouse_circle.setSize = mouse_circle_size;
 
 		import std;
 		
 		foreach(i; num_of_chain_objects.iota) {
-			ps ~= new Partical(Vector(uniform(0, 640), uniform(0, 480)));
+			train ~= new Carriage(Vec(uniform(0, 640), uniform(0, 480)));
 		}
 		foreach(i; num_of_cuddle_objects.iota) {
-			cols ~= new Collect(Vector(uniform(0, 640), uniform(0, 480)), uniform(0, size_max));
+			cuds ~= new Cuddle(Vec(uniform(0, 640), uniform(0, 480)), uniform(0, size_max));
 		}
 	}
 
@@ -67,15 +65,15 @@ class MyScene : Scene
 			The position of the circle is equal to 
 			the coordinates of the mouse.
 		+/
-		mouse_circle.pos = event.getMousePosition();
+		mouse_circle.setPos = event.getMousePosition();
 
 	}
 
 	override void step() {
-		foreach(i, p; ps)
-			p.update(i != ps.length - 1 ? ps[i + 1] : mouse_circle, cols);
-		foreach (Collect c; cols) {
-			c.update(mouse_circle, cols, ps);
+		foreach(i, p; train)
+			p.update(i != train.length - 1 ? train[i + 1] : mouse_circle, cuds);
+		foreach (Cuddle c; cuds) {
+			c.update(mouse_circle, cuds, train);
 		}
 	}
 
@@ -86,10 +84,10 @@ class MyScene : Scene
 	+/
 	override void draw(Display graph)
 	{
-		foreach(p; ps)
+		foreach(p; train)
 			p.draw(graph);
 
-		foreach(c; cols)
+		foreach(c; cuds)
 			c.draw(graph);
 
 		/+
@@ -97,7 +95,7 @@ class MyScene : Scene
 
 			- foxid.display
 		+/
-		graph.drawCircle(mouse_circle.pos, mouse_circle.size, Color("#FF0000"), true);
+		graph.drawCircle(mouse_circle.getPos, mouse_circle.getSize, Color("#FF0000"), true);
 	}
 
 }
@@ -113,7 +111,7 @@ unittest {
 
 	foxscene.inbegin();
 
-	Partical[] ps;
+	Carriage[] ps;
 	ps.length = 10;
 	ps.length.shouldEqual(10);
 
@@ -151,55 +149,10 @@ unittest  {
 
 @("Cannon")
 unittest {
-	Partical[] ps;
+	Carriage[] ps;
 
 	immutable count = 200;
 
 	ps.length = count;
 	assert(ps.length == 200);
-}
-
-class Partical {
-	static int currentID;
-	int id;
-	Vector pos;
-	int size;
-
-	this(Vector pos) {
-		id = currentID;
-		currentID += 1;
-		this.pos = pos;
-
-		globel_size += (bigger ? size_step : -size_step);
-		size = globel_size;
-		if (size >= size_max)
-			bigger = false;
-		else if (size <= size_min)
-			bigger = true;
-	}
-
-	void update(Partical leader, Collect[] cols) {
-		float dx, dy;
-		if (distance(leader.pos.x, leader.pos.y, pos.x, pos.y) > (leader.size + size)) { //gap_distance) {
-			xyaim(dx, dy, getAngle(pos.x, pos.y, leader.pos.x, leader.pos.y));
-			pos.x += dx * move_step;
-			pos.y += dy * move_step;
-		}
-
-        foreach(const c; cols) {
-			if (distance(c.pos.x, c.pos.y, pos.x, pos.y) < c.size + size) {
-				xyaim(dx, dy, getAngle(pos.x, pos.y, c.pos.x, c.pos.y));
-				pos.x -= dx * 1;
-				pos.y -= dy * 1;
-			}
-        }
-	}
-
-	auto getPos() {
-		return pos;
-	}
-
-	void draw(Display graph) {
-		graph.drawCircle(pos, size, Color(255,255,0, 128), true);
-	}
 }

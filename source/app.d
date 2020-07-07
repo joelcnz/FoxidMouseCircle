@@ -3,12 +3,16 @@ module source.app;
 //@safe:
 import foxid;
 
-import source.sceneandparticals;
+import source.scene;
 
 import bindbc.openal;
 
 import jmisc;
 
+//#undefined function
+/+
+Testing for OpenAL, should be in Testing folder (See _notes.txt)
++/
 void soundSetup() @system {
 	/*
 	This version attempts to load the OpenAL shared library using well-known variations
@@ -122,7 +126,7 @@ void soundSetup() @system {
 			ALvoid* data;
 			ALboolean loop = AL_FALSE;
 
-			//alutLoadWAVFile(fileName.ptr, &format, &data, &size, &freq, &loop);
+			//alutLoadWAVFile(fileName.ptr, &format, &data, &size, &freq, &loop); //#undefined function
 			// check for errors
 +/
 			import core.stdc.stdio;
@@ -135,10 +139,11 @@ version(unittest) {
 } else {
 	int main(string[] args)
 	{
-		soundSetup;
+		soundSetup; // displays current audio driver
 
+		// game setup
 		Game game = new Game(640, 480, "Solid Circles Animated - Test");
-		render.background = Color("#EE7C3F");
+		window.background = Color("#EE7C3F");
 
 		/+
 			Add to the scene in the manager.

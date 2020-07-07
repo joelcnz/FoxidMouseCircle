@@ -7,6 +7,6 @@ immutable move_step = 5;
 immutable size_step = 3;
 immutable size_max = 10;
 immutable size_min = size_step;
-int globel_size = size_min - 1;
+int globel_size = size_min - size_step;
 bool bigger = true;
 int gap_distance = 7;
