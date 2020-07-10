@@ -1,7 +1,4 @@
 {
-	"authors": [
-		"Joel Christensen"
-	],
 	"configurations": [
 		{
 			"name": "executable",
@@ -22,7 +19,6 @@
 			"targetType": "executable"
 		}
 	],
-	"copyright": "Copyright © 2020, Joel Christensen",
 	"dependencies": {
 		"foxid": "~>0.0.22",
 		"unit-threaded": "~>1.0.2"

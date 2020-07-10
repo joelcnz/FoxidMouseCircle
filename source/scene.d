@@ -41,7 +41,10 @@ class MyScene : Scene
 	}
 
 	override void init() {
-		mouse_circle = new Carriage(Vec(0,0));
+		size_min = size_step;
+		global_size = size_min - size_step;
+
+		mouse_circle = new Carriage();
 		mouse_circle.setSize = mouse_circle_size;
 
 		import std;
@@ -70,10 +73,10 @@ class MyScene : Scene
 	}
 
 	override void step() {
-		foreach(i, p; train)
-			p.update(i != train.length - 1 ? train[i + 1] : mouse_circle, cuds);
-		foreach (Cuddle c; cuds) {
-			c.update(mouse_circle, cuds, train);
+		foreach(i, ca; train)
+			ca.update(i != train.length - 1 ? train[i + 1] : mouse_circle, cuds);
+		foreach (Cuddle cu; cuds) {
+			cu.update(mouse_circle, cuds, train);
 		}
 	}
 

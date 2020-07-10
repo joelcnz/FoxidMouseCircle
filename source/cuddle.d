@@ -12,7 +12,7 @@ import source.carriage;
 class Cuddle {
     private:
     Vec pos;
-    int size;
+    float size;
 
     public:
 
@@ -24,7 +24,7 @@ class Cuddle {
         return size;
     }
 
-    this(Vec pos, int size) {
+    this(Vec pos, float size) {
         this.pos = pos;
         this.size = size;
     }
@@ -43,7 +43,7 @@ class Cuddle {
         }
 
         foreach(const cu; cuds) {
-            if  (this !is cu) {
+            if (this !is cu) {
                 if (distance(cu.getPos.x, cu.getPos.y, pos.x, pos.y) < cu.size + size) {
                     xyaim(dx, dy, getAngle(pos.x, pos.y, cu.getPos.x, cu.getPos.y));
                     pos.x -= dx * 1;
