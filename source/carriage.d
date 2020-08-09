@@ -17,9 +17,9 @@ class Carriage {
 
 	public:
 
-	const auto getPos() { return pos; }
+	const getPos() { return pos; }
 
-	const auto getSize() { return size; }
+	const getSize() { return size; }
 
 	void setSize(float size0) { size = size0; }
 
@@ -40,10 +40,14 @@ class Carriage {
 
 	/++
 	follow leader
-	
+
 	move away from on top of collecters
+
+	Params:
+		leader  = mouse location
+		cuds = cuddlers
 	+/
-	void update(Carriage leader, Cuddle[] cuds) {
+	void update(Carriage leader, Cuddle[] cuds,) {
 		float dx, dy;
 
 		// Head for pointer
@@ -76,7 +80,8 @@ class Carriage {
 	/++
 	Draw solid circle
 	+/
-	void draw(Display graph) {
-		graph.drawCircle(pos, size, Color(255,255,0, 128), true);
+	void draw(Display graph, float size, ubyte c) {
+		//graph.drawCircle(pos, size, Color(255,255,0, 128), true);
+		graph.drawCircle(pos, size, Color(c,c,0, 128), size > 2 ? false : true); //true);
 	}
 }

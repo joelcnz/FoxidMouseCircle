@@ -3,8 +3,8 @@ Solid circles animated
 Installation:
 Clone https://github.com/joelcnz/JMiscLib.git in the same folder as the root of this demo. See dub.json file.
 ```
-Foxidtest\..
-JMisc\..
+Foxidtest/..
+JMisc/..
 ```
 macOS:
 Install Simple Direct Media layer. I recomend using Home Brew - https://brew.sh/

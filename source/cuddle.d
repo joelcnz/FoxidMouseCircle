@@ -15,12 +15,13 @@ class Cuddle {
     float size;
 
     public:
-
-	const auto getPos() {
+	const getPos() {
 		return pos;
 	}
 
-    const auto getSize() {
+	void setSize(float size0) { size = size0; }
+
+    const getSize() {
         return size;
     }
 
@@ -61,7 +62,7 @@ class Cuddle {
         }
     }
 
-	void draw(Display graph) {
-		graph.drawCircle(pos, size, Color(0,255,255, 128), true);
+	void draw(Display graph, float size, ubyte c) {
+		graph.drawCircle(pos, size, Color(0,c,c, 128), size > 2 ? false : true); //true);
 	}
 }
