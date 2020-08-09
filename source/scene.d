@@ -80,6 +80,7 @@ class MyScene : Scene
 			carriageSizeSlider, carriageSliderText,
 			cuddleSizeSlider, cuddleSliderText]);
 
+
 /+
 		TextBox tb = new TextBox();
 		tb.font = loader.loadFont("../../Res/sans.ttf",14);
