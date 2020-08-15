@@ -7,19 +7,28 @@ import jmisc;
 
 import foxid;
 
+import source.base;
 import source.carriage;
 
 class Cuddle {
     private:
-    Vec pos;
+    Vec pos,
+        target,
+        dir;
     float size;
+    float r,g,b;
 
     public:
 	const getPos() {
 		return pos;
 	}
+    const getTargPos() {
+        return target;
+    }
 
 	void setSize(float size0) { size = size0; }
+    void setTarget(Vec pos) { target = pos; }
+    void setDir(Vec vec) { dir = vec; }
 
     const getSize() {
         return size;
@@ -30,6 +39,14 @@ class Cuddle {
         this.size = size;
     }
 
+    this(Vec pos, float size, ubyte r, ubyte g, ubyte b) {
+        this(pos, size);
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+
+    // prog version follow
     void update(Carriage pointer, Cuddle[] cuds, Carriage[] train) {
         float dx, dy;
 
@@ -62,7 +79,23 @@ class Cuddle {
         }
     }
 
-	void draw(Display graph, float size, ubyte c) {
-		graph.drawCircle(pos, size, Color(0,c,c, 128), size > 2 ? false : true); //true);
+    // homing
+    void update() {
+        import std.math;
+
+        pos.x += dir.x;
+        pos.y += dir.y;
+        if (abs(pos.x - target.x) < 0.05 &&
+            abs(pos.y - target.y) < 0.05) {
+            pos = target;
+            dir = Vec(0, 0);
+            g_aniState = AniState.pause;
+            //g_progVersion = ProgVersion.follow;
+        }
+    }
+
+	void draw(Display graph, float size, ubyte percent) {
+		//graph.drawCircle(pos, size, Color((r == 0 ? 1 + r : r) / percent,(g == 0 ? 1 + g : g) / percent,(b == 0 ? 1 + b : b) / percent, 128), size > 2 ? false : true);
+        graph.drawCircle(pos, size, Color(progressFraction(256, percent), 128), size > 2 ? false : true);
 	}
 }

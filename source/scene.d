@@ -1,3 +1,4 @@
+//#Text file
 //#set value not work
 module source.scene;
 
@@ -25,6 +26,8 @@ class MyScene : Scene
 	Slider mouseSizeSlider,
 		cuddleSizeSlider,
 		carriageSizeSlider;
+	string[] placementData;
+	HomingSetUp homingSetUpState;
 
 	/+
 		Circle position.
@@ -46,55 +49,132 @@ class MyScene : Scene
 	}
 
 	override void init() {
-		size_min = size_step;
-		global_size = size_min - size_step;
-
 		mouse_circle = new Carriage();
 		mouse_circle.setSize = mouse_circle_size;
+		g_aniState = AniState.still;
+		g_progVersion = ProgVersion.homing;
 
-		float textHpos = 140, hStep = 20;
+		final switch(g_progVersion) with(ProgVersion) {
+			case follow:
+				size_min = size_step;
+				global_size = size_min - size_step;
 
-		mouseSizeSlider = new Slider();
-		mouseSizeSlider.position = Vec(10, 1 * hStep);
-		//mouseSizeSlider.value = mouse_circle_size; //#set value not work
-		auto mouseSliderText = new TextBox();
-		mouseSliderText.font = loader.loadFont("../../Res/sans.ttf",14);
-		mouseSliderText.position = Vec(textHpos, 1 * hStep);
-		mouseSliderText.placeholder = "Pointer size";
+				float textHpos = 140, hStep = 20;
 
-		carriageSizeSlider = new Slider();
-		carriageSizeSlider.position = Vec(10, 2 * hStep);
-		auto carriageSliderText = new TextBox();
-		carriageSliderText.position = Vec(textHpos, 2 * hStep);
-		carriageSliderText.font = mouseSliderText.font;
-		carriageSliderText.placeholder = "Train Size";
+				mouseSizeSlider = new Slider();
+				mouseSizeSlider.position = Vec(10, 1 * hStep);
+				//mouseSizeSlider.value = mouse_circle_size; //#set value not work
+				auto mouseSliderText = new TextBox();
+				mouseSliderText.font = loader.loadFont("../../Res/sans.ttf",14);
+				mouseSliderText.position = Vec(textHpos, 1 * hStep);
+				mouseSliderText.placeholder = "Pointer size";
 
-		cuddleSizeSlider = new Slider();
-		cuddleSizeSlider.position = Vec(10, 3 * hStep);
-		auto cuddleSliderText = new TextBox();
-		cuddleSliderText.position = Vec(textHpos, 3 * hStep);
-		cuddleSliderText.font = mouseSliderText.font;
-		cuddleSliderText.placeholder = "Cuddles Size";
+				carriageSizeSlider = new Slider();
+				carriageSizeSlider.position = Vec(10, 2 * hStep);
+				auto carriageSliderText = new TextBox();
+				carriageSliderText.position = Vec(textHpos, 2 * hStep);
+				carriageSliderText.font = mouseSliderText.font;
+				carriageSliderText.placeholder = "Train Size";
 
-		add([mouseSizeSlider, mouseSliderText,
-			carriageSizeSlider, carriageSliderText,
-			cuddleSizeSlider, cuddleSliderText]);
+				cuddleSizeSlider = new Slider();
+				cuddleSizeSlider.position = Vec(10, 3 * hStep);
+				auto cuddleSliderText = new TextBox();
+				cuddleSliderText.position = Vec(textHpos, 3 * hStep);
+				cuddleSliderText.font = mouseSliderText.font;
+				cuddleSliderText.placeholder = "Cuddles Size";
 
+				add([mouseSizeSlider, mouseSliderText,
+					carriageSizeSlider, carriageSliderText,
+					cuddleSizeSlider, cuddleSliderText]);
 
-/+
-		TextBox tb = new TextBox();
-		tb.font = loader.loadFont("../../Res/sans.ttf",14);
-		tb.placeholder = "Input ..";
-		tb.position = Vec(32,32);
-+/
-		import std.range : iota;
-		import std.random : uniform;
-		
-		foreach(i; num_of_chain_objects.iota) {
-			train ~= new Carriage(Vec(uniform(0, 640), uniform(0, 480)));
+		/+
+				TextBox tb = new TextBox();
+				tb.font = loader.loadFont("../../Res/sans.ttf",14);
+				tb.placeholder = "Input ..";
+				tb.position = Vec(32,32);
+		+/
+				import std.range : iota;
+				import std.random : uniform;
+				
+				foreach(i; num_of_chain_objects.iota) {
+					train ~= new Carriage(Vec(uniform(0, 640), uniform(0, 480)));
+				}
+				foreach(i; num_of_cuddle_objects.iota) {
+					cuds ~= new Cuddle(Vec(uniform(0, 640), uniform(0, 480)), uniform(size_min, size_max));
+				}
+			break;
+			case homing:
+				homingSetUpState = HomingSetUp.spread;
+				setUpHoming;
+			break;
 		}
-		foreach(i; num_of_cuddle_objects.iota) {
-			cuds ~= new Cuddle(Vec(uniform(0, 640), uniform(0, 480)), uniform(size_min, size_max));
+	} // init
+
+	void setUpHoming() {
+		bool carrageReturn;
+		cuds.length = 0;
+		train.length = 0;
+		train ~= new Carriage(Vec(0, 0));
+		train[0].setSize = 1;
+		import std.file, std.string;
+		placementData = readText("Res/Emily.txt").split('\n'); //#Text file
+		immutable startX = 30,
+			startY = 70,
+			stepX = 20,
+			stepY = 20;
+		int x = startX, y = startY;
+		ubyte[] colourData;
+		//Color colour = Color(255,255,255);
+		foreach(lineNum, line; placementData) {
+			carrageReturn = false;
+			auto data = linep[line.indexOf(":") + 1 .. $];
+			switch(line.startsWith) {
+				case "colour:":
+					try {
+						colourData = data.split.to!(ubyte[]);
+						if (colourData.length != 3)
+							throw new Exception("Check colour data on line " ~ lineNum);
+						//	colour = Color(colourData[0], colourData[1], colourData[2]);
+					} catch(Exeception e) {
+						assert(0, "colour error");
+					}
+				break;
+				case "place:":
+					foreach(c; data) {
+						if (c == '0') {
+							final switch(homingSetUpState) with(HomingSetUp) {
+								case centre:
+									cuds ~= new Cuddle(Vec(320, 240), 15, colourData[0], colourData[1], colourData[2]);
+								break;
+								case spread:
+									import std.random;
+									cuds ~= new Cuddle(Vec(uniform(0, 640), uniform(0, 480)), 15, colourData[0], colourData[1], colourData[2]);
+								break;
+							}
+							with(cuds[$ - 1]) {
+								setTarget = Vec(x, y);
+							}
+						}
+						x += stepX;
+					}
+					carrageReturn = true;
+				break;
+			} // switch
+			if (carrageReturn = true)
+			x = startX;
+			y += stepY;
+		} // foreach
+		float dist = 0;
+		foreach(const cu; cuds) {
+			immutable cadadate = distance(cu.getPos.x, cu.getPos.y, cu.getTargPos.x, cu.getTargPos.y);
+			if (cadadate > dist)
+				dist = cadadate;
+		}
+		float dx, dy;
+		foreach(cu; cuds) {
+			xyaim(dx, dy, getAngle(cu.getPos.x, cu.getPos.y, cu.getTargPos.x, cu.getTargPos.y));
+			immutable dis = distance(cu.getPos.x, cu.getPos.y, cu.getTargPos.x, cu.getTargPos.y);
+			cu.setDir = Vec((dx * 2) * dis / dist, (dy * 2) * dis / dist);
 		}
 	}
 
@@ -114,25 +194,56 @@ class MyScene : Scene
 	}
 
 	override void step() {
-		if (mouse_circle.getSize != mouseSizeSlider.value) {
-			mouse_circle_size = mouseSizeSlider.value;
-			mouse_circle.setSize = mouse_circle_size;
+		final switch(g_progVersion) with(ProgVersion) {
+			case follow:
+				if (mouse_circle.getSize != mouseSizeSlider.value) {
+					mouse_circle_size = mouseSizeSlider.value;
+					mouse_circle.setSize = mouse_circle_size;
+				}
+
+				if (train.length && train[0].getSize != carriageSizeSlider.value) {
+					foreach(ref ca; train)
+						ca.setSize = carriageSizeSlider.value;
+				}
+
+				if (cuds.length && cuds[0].getSize != cuddleSizeSlider.value) {
+					foreach(ref cu; cuds)
+						cu.setSize = cuddleSizeSlider.value;
+				}
+
+				foreach(i, ca; train)
+					ca.update(i != train.length - 1 ? train[i + 1] : mouse_circle, cuds);
+				foreach(cu; cuds) {
+					cu.update(mouse_circle, cuds, train);
+				}
+			break;
+			case homing:
+			break;
 		}
 
-		if (train.length && train[0].getSize != carriageSizeSlider.value) {
-			foreach(ref ca; train)
-				ca.setSize = carriageSizeSlider.value;
-		}
-
-		if (cuds.length && cuds[0].getSize != cuddleSizeSlider.value) {
-			foreach(ref cu; cuds)
-				cu.setSize = cuddleSizeSlider.value;
-		}
-
-		foreach(i, ca; train)
-			ca.update(i != train.length - 1 ? train[i + 1] : mouse_circle, cuds);
-		foreach(cu; cuds) {
-			cu.update(mouse_circle, cuds, train);
+		final switch(g_aniState) with(AniState) {
+			case still:
+				g_aniState = AniState.homing_in;
+			break;
+			case homing_in:
+				foreach(ref cu; cuds)
+					cu.update;
+			break;
+			case following:
+			break;
+			case pause:
+				pauseTime -= 1;
+				if (pauseTime == 0) {
+					g_aniState = AniState.homing_in;
+					pauseTime = pauseTimeMax;
+					if (homingSetUpState == HomingSetUp.centre) {
+						homingSetUpState = HomingSetUp.spread;
+					} else {
+						homingSetUpState = HomingSetUp.centre;
+					}
+					setUpHoming;
+				}
+			break;
 		}
 	}
 
@@ -146,8 +257,11 @@ class MyScene : Scene
 		if (train.length && cuds.length) {
 			import std.range : iota;
 			import std.string : split;
-			immutable caColStep = 255 / train[0].getSize;
-			immutable cuColStep = 255 / cuds[0].getSize;
+			auto caColStep = 255 / train[0].getSize;
+			auto cuColStep = 255 / cuds[0].getSize;
+			//writeln("caColStep", caColStep);
+			if (caColStep == 0) caColStep = -1;
+			if (cuColStep == 0) cuColStep = -1;
 			float ca2 = caColStep;
 			float cu2 = cuColStep;
 			float cas = train[0].getSize,
@@ -165,7 +279,7 @@ class MyScene : Scene
 				
 				cas -= 1;
 				cus -= 1;
-			} while(! (cas < 1 && cus < 1));
+			} while(! (cas < 2 && cus < 2));
 		} // if both have at lessed one object
 
 		/+

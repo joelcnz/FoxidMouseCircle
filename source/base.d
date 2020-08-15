@@ -1,5 +1,7 @@
 module source.base;
 
+public import std.stdio;
+
 float mouse_circle_size = 60;
 int num_of_chain_objects = 30;
 int num_of_cuddle_objects = 20;
@@ -12,3 +14,15 @@ float global_size;
 bool bigger = true;
 float gap_distance = 7;
 float post_size = 7;
+AniState g_aniState;
+ProgVersion g_progVersion;
+int pauseTimeMax = 100;
+int pauseTime;
+
+enum ProgVersion {follow, homing}
+enum AniState {still, homing_in, following, pause}
+enum HomingSetUp {centre, spread}
+
+shared static this() {
+    pauseTime = pauseTimeMax;
+}
