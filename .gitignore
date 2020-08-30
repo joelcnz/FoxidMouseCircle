@@ -1,7 +1,8 @@
-
-bin/foxidtest
-bin/ut.d
-foxidtest-test-library
+assets
+backup.bin
+dub.selections.json
+rockdash
+jexold
 Sowerby
 BackUpSaves
 other
@@ -25,7 +26,6 @@ up
 *.lst
 dub.selections.json
 dub.userprefs
-esv.xml
 oversettings.ini
 settingfiles
 messages

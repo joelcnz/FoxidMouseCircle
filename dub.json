@@ -20,10 +20,14 @@
 		}
 	],
 	"dependencies": {
-		"foxid": "~>0.1.3",
+		"foxid": "~>0.2.0",
+		"foxidgui": "~>0.0.1",
 		"unit-threaded": "~>1.0.2"
 	},
 	"description": "Testing",
+	"dflags": [
+		"-version=safe"
+	],
 	"importPaths": [
 		"../../JMiscLib/source"
 	],
@@ -31,7 +35,7 @@
 	"name": "foxidtest",
 	"sourcePaths": [
 		"source",
-		"../../JMiscLib/source"
+		"../JMiscLib/source"
 	],
 	"targetPath": "bin",
 	"targetType": "executable"
